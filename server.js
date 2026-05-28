@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from "path";
 
 // Routes
 import authRoutes from './server/routes/authRoutes.js';
@@ -23,9 +24,7 @@ mongoose.connect(mongoUri)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-app.get('/', (req, res) => {
-  res.send('<h1>Aarogya Backend is running!</h1><p>Please open the frontend at <a href="http://localhost:5173">http://localhost:5173</a></p>');
-});
+
 
 // Register Routes
 app.use('/api/auth', authRoutes);
@@ -34,6 +33,12 @@ app.use('/api/records', recordRoutes);
 app.use('/api/check-in', checkInRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/access-logs', accessLogRoutes);
+
+app.use(express.static(path.join(process.cwd(), "dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+});
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
