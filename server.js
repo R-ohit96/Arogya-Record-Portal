@@ -36,7 +36,7 @@ app.use('/api/access-logs', accessLogRoutes);
 
 app.use(express.static(path.join(process.cwd(), "dist")));
 
-app.get("*", (req, res) => {
+app.get("/*", (req, res) => {
   res.sendFile(path.join(process.cwd(), "dist", "index.html"));
 });
 
