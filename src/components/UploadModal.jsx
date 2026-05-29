@@ -77,7 +77,7 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
     onClose();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !previewUrl) {
       alert('Please provide a title and upload a document or capture a photo.');
@@ -93,7 +93,12 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
       imageUrl: previewUrl,
     };
 
-    addRecord(newRecord);
+    const result = await addRecord(newRecord);
+    if (result?.success) {
+      alert('Upload successful!');
+    } else {
+      alert(`Upload failed: ${result?.message || 'Unknown error'}`);
+    }
     closeAndReset();
   };
 
