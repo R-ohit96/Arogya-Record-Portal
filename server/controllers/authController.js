@@ -100,6 +100,15 @@ export const registerUser = async (req, res) => {
     // Normalize email to lowercase (for Doctor/Hospital)
     if (userData.email) {
       userData.email = userData.email.trim().toLowerCase();
+    } else {
+      delete userData.email; // Prevent E11000 duplicate key error on empty string
+    }
+
+    if (!userData.id) {
+      delete userData.id;
+    }
+    if (!userData.aadhaarNumber) {
+      delete userData.aadhaarNumber;
     }
 
     // For non‑PATIENT roles, email is mandatory
@@ -222,11 +231,18 @@ export const loginUser = async (req, res) => {
   try {
     const { role, id, password } = req.body;
 
-    // Normalize email for non‑PATIENT
-    const normalizedId = role === 'PATIENT' ? id : (id || '').trim().toLowerCase();
+    const originalId = (id || '').trim();
+    // Normalize email for non-PATIENT
+    const normalizedId = role === 'PATIENT' ? originalId : originalId.toLowerCase();
 
-    // Patient logins with AadhaarNumber, Doctor/Hospital logins with Email
-    const query = role === 'PATIENT' ? { aadhaarNumber: normalizedId } : { email: normalizedId };
+    // Patient logins with AadhaarNumber or legacy PatientId
+    // Doctor/Hospital logins with Email or legacy ID
+    let query;
+    if (role === 'PATIENT') {
+      query = { $or: [{ aadhaarNumber: originalId }, { patientId: originalId }, { id: originalId }] };
+    } else {
+      query = { $or: [{ email: normalizedId }, { id: originalId }, { id: originalId.toUpperCase() }] };
+    }
     const user = await User.findOne(query);
 
     if (!user) {

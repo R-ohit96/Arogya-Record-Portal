@@ -30,8 +30,8 @@ const Login = () => {
     };
 
     if (role === 'PATIENT') {
-      if (aadhaar.length !== 12) {
-        triggerError(t('error_aadhaar'));
+      if (!aadhaar) {
+        triggerError("Please enter your Aadhaar or Patient ID.");
         return;
       }
       if (!password) {
@@ -136,14 +136,14 @@ const Login = () => {
           )}
           {role === 'PATIENT' && (
             <div className="form-group">
-              <label className="form-label">{t('aadhaar_number')}</label>
+              <label className="form-label">Aadhaar or Patient ID</label>
               <input 
                 type="text" 
                 className="form-control" 
-                placeholder="0000 0000 0000" 
+                placeholder="0000 0000 0000 or AAR-XXXX" 
                 value={aadhaar}
-                onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, '').substring(0, 12))}
-                maxLength={12}
+                onChange={(e) => setAadhaar(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').substring(0, 15))}
+                maxLength={15}
                 required
               />
             </div>
@@ -151,11 +151,11 @@ const Login = () => {
 
           {(role === 'HOSPITAL' || role === 'DOCTOR') && (
             <div className="form-group">
-              <label className="form-label">Email Address</label>
+              <label className="form-label">Email or Registry ID</label>
               <input 
-                type="email" 
+                type="text" 
                 className="form-control" 
-                placeholder="name@example.com" 
+                placeholder="Email or ID (e.g., DOC001)" 
                 value={staffEmail}
                 onChange={(e) => setStaffEmail(e.target.value)}
                 required
