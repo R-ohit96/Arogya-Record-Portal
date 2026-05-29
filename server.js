@@ -24,21 +24,28 @@ mongoose.connect(mongoUri)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-
+// ========== HEALTH CHECK ROUTE (ADD THIS) ==========
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server is running' });
+});
+// ===================================================
 
 // Register Routes
 app.use('/api/auth', authRoutes);
-app.use('/api', otpRoutes); // Mounts /api/send-sms-otp, etc.
+app.use('/api', otpRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/check-in', checkInRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/access-logs', accessLogRoutes);
 
+// Static files (frontend)
 app.use(express.static(path.join(process.cwd(), "dist")));
 
-app.get("*splat", (req, res) => {
+// ========== CHANGE THIS LINE ==========
+app.get("*", (req, res) => {  // "splat" hatao, sirf "*" rakho
   res.sendFile(path.join(process.cwd(), "dist", "index.html"));
 });
+// ======================================
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
