@@ -11,6 +11,8 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   
+  const [isUploading, setIsUploading] = useState(false);
+
   // Camera specific state
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef(null);
@@ -73,6 +75,7 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
     setPreviewUrl('');
     setTitle('');
     setDescription('');
+    setIsUploading(false);
     stopCamera();
     onClose();
   };
@@ -84,6 +87,8 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
       return;
     }
 
+    setIsUploading(true);
+
     const newRecord = {
       patientAadhaar: patientAadhaar || currentUser.aadhaarNumber,
       uploaderType: currentUser.role === 'STAFF' ? 'HOSPITAL' : currentUser.role,
@@ -94,12 +99,14 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
     };
 
     const result = await addRecord(newRecord);
-    if (result?.success) {
+    
+    if (result && result.success) {
       alert('Upload successful!');
+      closeAndReset();
     } else {
-      alert(`Upload failed: ${result?.message || 'Unknown error'}`);
+      alert(result?.message || 'Upload failed. Please try again.');
+      setIsUploading(false);
     }
-    closeAndReset();
   };
 
   useEffect(() => {
@@ -199,8 +206,8 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-              Submit Record
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Submit Record'}
             </button>
           </div>
         </form>
