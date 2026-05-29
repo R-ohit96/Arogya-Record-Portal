@@ -1,26 +1,17 @@
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import sendEmail from '../utils/emailService.js';
 
 dotenv.config();
 
 const emailUser = process.env.EMAIL_USER;
-const emailPass = process.env.EMAIL_PASS;
+const brevoApiKey = process.env.BREVO_API_KEY;
 
-if (!emailUser || !emailPass) {
-  console.warn('EMAIL env missing. Please set EMAIL_USER and EMAIL_PASS (App Password) for real emails.');
+if (!emailUser || !brevoApiKey) {
+  console.warn('Brevo configuration missing. Please set EMAIL_USER and BREVO_API_KEY in .env.');
 }
 
 const otpStore = new Map();
 const emailOtpStore = new Map();
-
-// Email Transporter Setup
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: emailUser,
-    pass: emailPass,
-  },
-});
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -75,11 +66,10 @@ export const sendEmailOtp = async (req, res) => {
   console.log(`\n📧 [EMAIL OTP] OTP for ${email} => \x1b[33m${code}\x1b[0m\n`);
 
   try {
-    await transporter.sendMail({
-      from: `"Aarogya Portal" <${emailUser}>`,
-      to: email,
+    const emailResult = await sendEmail({
+      email,
+      name: 'Aarogya User',
       subject: 'Your Registration OTP - Aarogya Record Portal',
-      text: `Your verification code is: ${code}. This code is valid for 5 minutes.`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #2563eb;">Aarogya Record Portal</h2>
@@ -92,6 +82,10 @@ export const sendEmailOtp = async (req, res) => {
         </div>
       `,
     });
+
+    if (!emailResult.success) {
+      throw new Error(emailResult.error || 'Failed to send email');
+    }
 
     return res.json({ success: true, message: `OTP sent to ${email}. Check your inbox (or server console).` });
   } catch (error) {
