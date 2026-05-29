@@ -235,14 +235,24 @@ export const loginUser = async (req, res) => {
     // Normalize email for non-PATIENT
     const normalizedId = role === 'PATIENT' ? originalId : originalId.toLowerCase();
 
-    // Patient logins with AadhaarNumber or legacy PatientId
-    // Doctor/Hospital logins with Email or legacy ID
     let query;
     if (role === 'PATIENT') {
-      // Patient logs in strictly with 12-digit Aadhaar number only
-      query = { aadhaarNumber: originalId };
+      // Patient logs in strictly with 12-digit Aadhaar number only and must have PATIENT role
+      query = { aadhaarNumber: originalId, role: 'PATIENT' };
     } else {
-      query = { $or: [{ email: normalizedId }, { id: originalId }, { id: originalId.toUpperCase() }] };
+      // Helper to escape regex special characters
+      const escapeRegex = (str) => str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const escapedId = escapeRegex(originalId);
+
+      // Case-insensitive match on Registry ID, exact match on normalized email,
+      // and ensure role is DOCTOR or belongs to [HOSPITAL, STAFF] depending on login role
+      query = {
+        $or: [
+          { email: normalizedId },
+          { id: { $regex: new RegExp('^' + escapedId + '$', 'i') } }
+        ],
+        role: role === 'HOSPITAL' ? { $in: ['HOSPITAL', 'STAFF'] } : role
+      };
     }
     const user = await User.findOne(query);
 
