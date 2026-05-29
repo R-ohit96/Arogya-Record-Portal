@@ -21,6 +21,8 @@ const _generateOtp = () =>
 
 // ── SMS OTP "" THIS IS FOR LOCALHOST"" ──────────────────────────────────────────────────
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000' : '');
+
 export const sendSmsOtp = async (mobile) => {
   if (!mobile || mobile.length !== 10) {
     return { success: false, message: 'Valid 10-digit mobile required.' };
@@ -64,7 +66,7 @@ export const sendSmsOtp = async (mobile) => {
   }
 
   try {
-    const response = await fetch('http://localhost:4000/api/send-sms-otp', {
+    const response = await fetch(`${API_BASE_URL}/api/send-sms-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile })
@@ -87,7 +89,7 @@ export const verifySmsOtp = async (mobile, otp) => {
   if (!mobile || !otp) return { success: false, message: 'Missing data.' };
 
   try {
-    const response = await fetch('http://localhost:4000/api/verify-sms-otp', {
+    const response = await fetch(`${API_BASE_URL}/api/verify-sms-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile, otp })
@@ -115,7 +117,7 @@ export const sendEmailOtp = async (email) => {
   }
 
   try {
-    const response = await fetch('http://localhost:4000/api/send-email-otp', {
+    const response = await fetch(`${API_BASE_URL}/api/send-email-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
@@ -140,7 +142,7 @@ export const verifyEmailOtp = async (email, otp) => {
   if (!email || !otp) return { success: false, message: 'Missing data.' };
 
   try {
-    const response = await fetch('http://localhost:4000/api/verify-email-otp', {
+    const response = await fetch(`${API_BASE_URL}/api/verify-email-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, otp })

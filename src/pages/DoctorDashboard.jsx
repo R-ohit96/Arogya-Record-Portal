@@ -44,7 +44,7 @@ const DoctorDashboard = () => {
     const intervalId = setInterval(async () => {
       try {
         const myId = currentUser.role === 'STAFF' ? currentUser.parentId : currentUser.id;
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
         
         const response = await fetch(`${API_BASE_URL}/check-in/poll/${myId}`);
         const result = await response.json();
@@ -73,7 +73,7 @@ const DoctorDashboard = () => {
     e.preventDefault();
     if (searchAadhaar.length === 12) {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
         const response = await fetch(`${API_BASE_URL}/users/${searchAadhaar}`);
         const result = await response.json();
         

@@ -7,7 +7,7 @@ import EmergencyQR from '../components/EmergencyQR';
 import ClinicQR from '../components/ClinicQR';
 import { sendSmsOtp, verifySmsOtp } from '../services/smsService';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000' : '');
 
 const MyProfile = () => {
   const { currentUser, updateProfile, logout } = useAuth();

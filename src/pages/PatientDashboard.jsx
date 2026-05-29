@@ -26,7 +26,7 @@ const PatientDashboard = () => {
     // Load active accesses from backend
     const loadAccesses = async () => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
         const response = await fetch(`${API_BASE_URL}/access-logs/patient/${currentUser.aadhaarNumber}`);
         const result = await response.json();
         if (result.success) {
@@ -57,7 +57,7 @@ const PatientDashboard = () => {
 
   const handleRevoke = async (logId) => {
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
       const response = await fetch(`${API_BASE_URL}/access-logs/revoke/${logId}`, { method: 'PUT' });
       const result = await response.json();
       if (result.success) {
@@ -210,7 +210,7 @@ const PatientDashboard = () => {
         onScanSuccess={async (data) => {
           if (data && data.type === 'CLINIC_CHECKIN') {
             try {
-              const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+              const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
               // Check if we already imported axios, if not we will fetch
               const response = await fetch(`${API_BASE_URL}/check-in`, {
                 method: 'POST',
