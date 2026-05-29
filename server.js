@@ -41,11 +41,11 @@ app.use('/api/access-logs', accessLogRoutes);
 // Static files (frontend)
 app.use(express.static(path.join(process.cwd(), "dist")));
 
-// ========== CHANGE THIS LINE ==========
-app.get("*", (req, res) => {  // "splat" hatao, sirf "*" rakho
+// ========== SERVE SPA INDEX.HTML FOR UNMATCHED ROUTES ==========
+app.use((req, res) => {
   res.sendFile(path.join(process.cwd(), "dist", "index.html"));
 });
-// ======================================
+// ===============================================================
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
