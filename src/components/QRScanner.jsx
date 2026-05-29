@@ -6,6 +6,12 @@ const QRScanner = ({ isOpen, onClose, onScanSuccess }) => {
   const [error, setError] = useState('');
   const scannerRef = useRef(null);
 
+  // Store callbacks in a mutable ref to prevent effect re-runs when parent components re-render
+  const callbacksRef = useRef({ onScanSuccess, onClose });
+  useEffect(() => {
+    callbacksRef.current = { onScanSuccess, onClose };
+  }, [onScanSuccess, onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -27,14 +33,14 @@ const QRScanner = ({ isOpen, onClose, onScanSuccess }) => {
         if (data.type === 'AAROGYA_EMERGENCY' && data.patientId) {
           // Success! Stop scanner and notify parent
           scanner.clear().then(() => {
-            onScanSuccess(data.patientId);
-            onClose();
+            callbacksRef.current.onScanSuccess(data.patientId);
+            callbacksRef.current.onClose();
           }).catch(err => console.error("Failed to clear scanner", err));
         } else if (data.type === 'CLINIC_CHECKIN' && data.doctorId) {
            // Success for clinic check-in
            scanner.clear().then(() => {
-             onScanSuccess({ type: 'CLINIC_CHECKIN', doctorId: data.doctorId });
-             onClose();
+             callbacksRef.current.onScanSuccess({ type: 'CLINIC_CHECKIN', doctorId: data.doctorId });
+             callbacksRef.current.onClose();
            }).catch(err => console.error("Failed to clear scanner", err));
         } else {
           setError('Invalid Aarogya QR format.');
@@ -43,8 +49,8 @@ const QRScanner = ({ isOpen, onClose, onScanSuccess }) => {
         // If not JSON, check if it's a raw 12-digit Aadhaar
         if (/^\d{12}$/.test(decodedText)) {
           scanner.clear().then(() => {
-            onScanSuccess(decodedText);
-            onClose();
+            callbacksRef.current.onScanSuccess(decodedText);
+            callbacksRef.current.onClose();
           }).catch(err => console.error("Failed to clear scanner", err));
         } else {
           setError('Could not recognize QR code content.');
@@ -68,7 +74,7 @@ const QRScanner = ({ isOpen, onClose, onScanSuccess }) => {
         });
       }
     };
-  }, [isOpen, onScanSuccess, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
