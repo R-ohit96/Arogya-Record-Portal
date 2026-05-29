@@ -4,7 +4,8 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
-let API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
+let API_BASE_URL = 'https://arogya-record-portal.onrender.com/api';
+
 if (API_BASE_URL.endsWith('/')) API_BASE_URL = API_BASE_URL.slice(0, -1);
 if (!API_BASE_URL.endsWith('/api')) API_BASE_URL += '/api';
 
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }) => {
     if (user) {
       localStorage.setItem('currentUser', JSON.stringify(user));
       if (user.profilePic && user.profilePic.startsWith('data:')) {
-         localStorage.setItem(`photo_${user.aadhaarNumber || user.id}`, user.profilePic);
+        localStorage.setItem(`photo_${user.aadhaarNumber || user.id}`, user.profilePic);
       }
     } else {
       localStorage.removeItem('currentUser');
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   const registerPatient = async (aadhaarNumber, name, mobile, gender, age, password, alternateMobile = '', email = '', address = '', dob = '', localAddress = '') => {
     try {
       const patientId = generatePatientId();
-      const userData = { 
+      const userData = {
         role: 'PATIENT', aadhaarNumber, name, mobile, alternateMobile, email, gender, age, address, localAddress, dob, patientId, password
       };
       const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
@@ -70,7 +71,7 @@ export const AuthProvider = ({ children }) => {
 
   const registerHospital = async (hospitalId, hospitalName, password, mobile, alternateMobile = '', email = '', hospitalCategory = 'PRIVATE') => {
     try {
-      const userData = { 
+      const userData = {
         role: 'HOSPITAL', id: hospitalId, name: hospitalName, password, mobile, alternateMobile, email, facilityCategory: hospitalCategory
       };
       const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }) => {
 
   const registerDoctor = async (doctorId, name, password, mobile, alternateMobile = '', email = '', specialization = '') => {
     try {
-      const userData = { 
+      const userData = {
         role: 'DOCTOR', id: doctorId, name, password, mobile, alternateMobile, email, specialization
       };
       const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
@@ -125,7 +126,7 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, message: response.data.message };
     } catch (error) {
-       return { success: false, message: error.response?.data?.message || 'Login failed' };
+      return { success: false, message: error.response?.data?.message || 'Login failed' };
     }
   };
 
@@ -140,7 +141,7 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, message: response.data.message };
     } catch {
-       return { success: false, message: 'Login failed' };
+      return { success: false, message: 'Login failed' };
     }
   };
 
@@ -177,7 +178,7 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, message: response.data.message };
     } catch (error) {
-       return { success: false, message: error.response?.data?.message || 'Failed to add staff' };
+      return { success: false, message: error.response?.data?.message || 'Failed to add staff' };
     }
   };
 
@@ -212,10 +213,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
+    <AuthContext.Provider value={{
       currentUser, isAuthLoaded,
-      registerPatient, registerHospital, registerDoctor, 
-      loginPatient, loginHospital, loginDoctor, resetPassword, 
+      registerPatient, registerHospital, registerDoctor,
+      loginPatient, loginHospital, loginDoctor, resetPassword,
       updatePatientProfile, logout, createStaff, fetchStaffList, deleteStaff,
       updateProfile
     }}>

@@ -23,10 +23,10 @@ export const generateAadhaarOTP = async (aadhaarNumber) => {
   */
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({ 
-        success: true, 
-        referenceId: "REF_" + Math.random().toString(36).substring(7), 
-        message: 'SIMULATED: Govt OTP Sent to linked mobile!' 
+      resolve({
+        success: true,
+        referenceId: "REF_" + Math.random().toString(36).substring(7),
+        message: 'SIMULATED: Govt OTP Sent to linked mobile!'
       });
     }, 1000);
   });
@@ -37,12 +37,12 @@ export const generateAadhaarOTP = async (aadhaarNumber) => {
  */
 export const verifyAadhaarOTP = async (referenceId, otp) => {
   console.log("SIMULATING Aadhaar Verify for:", referenceId, otp);
-  
+
   return new Promise((resolve) => {
     setTimeout(() => {
       if (otp === '123456') {
-        resolve({ 
-          success: true, 
+        resolve({
+          success: true,
           identity: {
             name: "Rahul Sharma (Verified)",
             gender: "M",
