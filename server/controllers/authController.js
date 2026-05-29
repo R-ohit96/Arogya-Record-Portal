@@ -239,7 +239,8 @@ export const loginUser = async (req, res) => {
     // Doctor/Hospital logins with Email or legacy ID
     let query;
     if (role === 'PATIENT') {
-      query = { $or: [{ aadhaarNumber: originalId }, { patientId: originalId }, { id: originalId }] };
+      // Patient logs in strictly with 12-digit Aadhaar number only
+      query = { aadhaarNumber: originalId };
     } else {
       query = { $or: [{ email: normalizedId }, { id: originalId }, { id: originalId.toUpperCase() }] };
     }

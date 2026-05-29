@@ -9,7 +9,8 @@ const _generateOtp = () =>
 
 // ── SMS OTP "" THIS IS FOR LOCALHOST"" ──────────────────────────────────────────────────
 
-const API_BASE_URL = 'https://arogya-record-portal.onrender.com';
+const isLocalDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API_BASE_URL = isLocalDev ? 'http://localhost:4000' : (typeof window !== 'undefined' ? window.location.origin : '');
 export const sendSmsOtp = async (mobile) => {
   if (!mobile || mobile.length !== 10) {
     return { success: false, message: 'Valid 10-digit mobile required.' };

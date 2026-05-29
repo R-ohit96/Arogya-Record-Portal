@@ -59,7 +59,7 @@ const DoctorDashboard = () => {
           
           navigate(`/patient-profile/${result.checkIn.patientId}`);
         }
-      } catch (error) {
+      } catch {
         // Ignore polling errors silently
       }
     }, 2000);
@@ -82,7 +82,7 @@ const DoctorDashboard = () => {
         } else {
           alert("PATIENT NOT REGISTERED / NOT FOUND");
         }
-      } catch (error) {
+      } catch {
         alert("Error connecting to server. Please try again.");
       }
     } else {

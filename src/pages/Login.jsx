@@ -30,8 +30,8 @@ const Login = () => {
     };
 
     if (role === 'PATIENT') {
-      if (!aadhaar) {
-        triggerError("Please enter your Aadhaar or Patient ID.");
+      if (aadhaar.length !== 12) {
+        triggerError(t('error_aadhaar'));
         return;
       }
       if (!password) {
@@ -136,14 +136,14 @@ const Login = () => {
           )}
           {role === 'PATIENT' && (
             <div className="form-group">
-              <label className="form-label">Aadhaar or Patient ID</label>
+              <label className="form-label">{t('aadhaar_number')}</label>
               <input 
                 type="text" 
                 className="form-control" 
-                placeholder="0000 0000 0000 or AAR-XXXX" 
+                placeholder="0000 0000 0000" 
                 value={aadhaar}
-                onChange={(e) => setAadhaar(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').substring(0, 15))}
-                maxLength={15}
+                onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, '').substring(0, 12))}
+                maxLength={12}
                 required
               />
             </div>

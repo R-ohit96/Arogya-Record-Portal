@@ -35,7 +35,7 @@ const PatientDashboard = () => {
         if (result.success) {
           setActiveAccesses(result.logs);
         }
-      } catch (e) {
+      } catch {
         // Silently ignore fetch errors
       }
       setCurrentTime(Date.now());
@@ -66,7 +66,7 @@ const PatientDashboard = () => {
       if (result.success) {
         setActiveAccesses(prev => prev.filter(p => p._id !== logId));
       }
-    } catch (e) {
+    } catch {
       alert('Failed to revoke access. Please try again.');
     }
   };

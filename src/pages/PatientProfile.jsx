@@ -85,7 +85,7 @@ const PatientProfile = () => {
           alert(reason);
           navigate('/doctor-dashboard');
         }
-      } catch (e) {
+      } catch {
         // Silently ignore polling errors
       }
     };
