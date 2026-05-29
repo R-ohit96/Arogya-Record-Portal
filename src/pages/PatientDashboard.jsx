@@ -10,7 +10,7 @@ import { useNavigate, Link } from 'react-router-dom';
 
 const PatientDashboard = () => {
   const { currentUser, logout } = useAuth();
-  const { getPatientRecords } = useRecords();
+  const { getPatientRecords, fetchRecords } = useRecords();
   const { t, lang, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,6 +23,9 @@ const PatientDashboard = () => {
       navigate('/');
       return;
     }
+    // Fetch patient's medical records on mount
+    fetchRecords(currentUser.aadhaarNumber);
+
     // Load active accesses from backend
     const loadAccesses = async () => {
       try {
@@ -40,7 +43,7 @@ const PatientDashboard = () => {
     loadAccesses();
     const intervalId = setInterval(loadAccesses, 5000); // refresh every 5s
     return () => clearInterval(intervalId);
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, fetchRecords]);
 
   if (!currentUser || currentUser.role !== 'PATIENT') {
     return null;
