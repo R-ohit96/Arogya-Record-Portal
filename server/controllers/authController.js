@@ -39,7 +39,7 @@ export const requestPasswordReset = async (req, res) => {
     const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
     passwordResetStore.set(mobile, { otp, expiresAt, tries: 0, role, identifier });
     // For demo purposes, log OTP to console (same style as existing OTP utils)
-    console.log(`\n📱 [RESET OTP] OTP for +91${mobile} =\> \x1b[33m${otp}\x1b[0m\n`);
+    console.log(`\n📱 [RESET OTP] OTP for +91${mobile} => \x1b[33m${otp}\x1b[0m\n`);
     return res.json({ success: true, message: 'OTP sent (check console).' });
   } catch (error) {
     console.error('Password reset request error:', error);

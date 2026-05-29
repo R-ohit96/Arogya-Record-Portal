@@ -6,7 +6,10 @@ const RecordsContext = createContext();
 
 export const useRecords = () => useContext(RecordsContext);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
+let API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
+
+if (API_BASE_URL.endsWith('/')) API_BASE_URL = API_BASE_URL.slice(0, -1);
+if (!API_BASE_URL.endsWith('/api')) API_BASE_URL += '/api';
 
 export const RecordsProvider = ({ children }) => {
   const [records, setRecords] = useState([]);
