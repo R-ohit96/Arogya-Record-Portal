@@ -136,7 +136,7 @@ const PatientProfile = () => {
   if (!currentUser) return null;
 
   const allRecords = getPatientRecords(aadhaar);
-  const hospitalRecords = allRecords.filter(r => r.uploaderType === 'HOSPITAL');
+  const hospitalRecords = allRecords.filter(r => r.uploaderType === 'HOSPITAL' || r.uploaderType === 'DOCTOR' || r.uploaderType === 'STAFF');
   const patientRecords = allRecords.filter(r => r.uploaderType === 'PATIENT');
 
   if (loading) {

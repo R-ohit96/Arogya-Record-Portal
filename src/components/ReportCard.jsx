@@ -17,9 +17,9 @@ const ReportCard = ({ record }) => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState('');
 
-  const isHospitalUpload = record.uploaderType === 'HOSPITAL';
+  const isHospitalUpload = ['HOSPITAL', 'DOCTOR', 'STAFF'].includes(record.uploaderType);
   const isMine = (currentUser?.role === 'PATIENT' && record.uploaderType === 'PATIENT') ||
-                 (currentUser?.role === 'HOSPITAL' && record.uploaderName === currentUser?.name);
+                 (['HOSPITAL', 'DOCTOR', 'STAFF'].includes(currentUser?.role) && record.uploaderName === currentUser?.name);
 
   // Resolve image URL (now uses Cloudinary URLs from backend)
   const getImageUrl = () => {
