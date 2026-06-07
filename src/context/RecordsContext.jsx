@@ -16,7 +16,7 @@ export const RecordsProvider = ({ children }) => {
   const [records, setRecords] = useState([]);
   const [isLoaded] = useState(true);
 
-  const fetchRecords = async (patientId) => {
+  const fetchRecords = React.useCallback(async (patientId) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/records/${patientId}`);
       if (response.data.success) {
@@ -37,7 +37,7 @@ export const RecordsProvider = ({ children }) => {
       console.error("Fetch Records Error:", e);
       return [];
     }
-  };
+  }, []);
 
   const addRecord = async (recordData) => {
     try {
