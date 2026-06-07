@@ -185,6 +185,7 @@ export const createStaff = async (req, res) => {
       name,
       email: normalizedEmail,
       password: hashedPassword,
+      plainPassword: password,
       mobile,
       role: 'STAFF',
       parentId,
@@ -301,17 +302,21 @@ export const loginUser = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
+    const searchId = (req.params.id || '').trim();
+    console.log('[getUserById] Searching for:', searchId);
     const user = await User.findOne({
-      $or: [{ aadhaarNumber: req.params.id }, { id: req.params.id }]
+      $or: [{ aadhaarNumber: searchId }, { id: searchId }]
     });
     if (user) {
+      console.log('[getUserById] Found user:', user.name, 'role:', user.role);
       res.json({ success: true, user });
     } else {
+      console.log('[getUserById] No user found for:', searchId);
       res.status(404).json({ success: false, message: 'User not found' });
     }
   } catch (error) {
     console.error('User fetch error:', error);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false, message: 'Server error fetching user' });
   }
 };
 

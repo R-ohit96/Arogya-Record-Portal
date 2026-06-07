@@ -96,15 +96,19 @@ const PatientProfile = () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/users/${aadhaar}`);
         const result = await response.json();
+        console.log('[PatientProfile] API response for', aadhaar, ':', result);
         if (result.success && result.user) {
           setPatientData(result.user);
           await fetchRecords(aadhaar);
-          await grantAccessAndNotify(result.user.mobile);
+          // Don't block profile loading if access log fails
+          grantAccessAndNotify(result.user.mobile).catch(e => console.error('Access notify error:', e));
         } else {
+          console.warn('[PatientProfile] Patient not found for aadhaar:', aadhaar);
           setPatientData(null);
         }
       } catch (err) {
         console.error("Error loading patient profile:", err);
+        setPatientData(null);
       } finally {
         setLoading(false);
       }

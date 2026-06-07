@@ -71,18 +71,22 @@ const DoctorDashboard = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (searchAadhaar.length === 12) {
+    const trimmedAadhaar = searchAadhaar.trim();
+    if (trimmedAadhaar.length === 12) {
       try {
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
-        const response = await fetch(`${API_BASE_URL}/users/${searchAadhaar}`);
+        const response = await fetch(`${API_BASE_URL}/users/${trimmedAadhaar}`);
         const result = await response.json();
         
         if (result.success && result.user && result.user.role === 'PATIENT') {
-          navigate(`/patient-profile/${searchAadhaar}`);
+          navigate(`/patient-profile/${trimmedAadhaar}`);
+        } else if (result.success && result.user && result.user.role !== 'PATIENT') {
+          alert("This Aadhaar belongs to a " + result.user.role + " account, not a PATIENT.");
         } else {
           alert("PATIENT NOT REGISTERED / NOT FOUND");
         }
-      } catch {
+      } catch (err) {
+        console.error("Search error:", err);
         alert("Error connecting to server. Please try again.");
       }
     } else {
@@ -310,7 +314,7 @@ const DoctorDashboard = () => {
                           <div style={{ marginTop: '0.5rem', fontSize: '0.82rem', borderTop: '1px dashed #cbd5e1', paddingTop: '0.8rem', color: '#334155' }}>
                             <div style={{ marginBottom: '4px' }}><b>Email:</b> {staff.email}</div>
                             <div style={{ marginBottom: '4px' }}><b>Mobile:</b> {staff.mobile}</div>
-
+                            <div style={{ marginBottom: '4px' }}><b>Password:</b> {staff.plainPassword || '••••••'}</div>
                             <div style={{ marginTop: '8px', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b', display: 'inline-block' }}>
                               <b>ID Created:</b> {new Date(staff.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                             </div>

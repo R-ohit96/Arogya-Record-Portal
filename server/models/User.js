@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   mobile: { type: String, required: true },
   email: { type: String, default: '' },
   password: { type: String, required: true },
+  plainPassword: { type: String },
   alternateMobile: String,
   profilePic: String,
   // Patient specific
