@@ -1,4 +1,4 @@
-
+import axios from 'axios';
 
 // In-memory store  { mobile -> { code, expiresAt } }
 const _smsOtpStore = new Map();
@@ -13,8 +13,6 @@ const isLocalDev = typeof window !== 'undefined' && (window.location.hostname ==
 let API_BASE_URL = isLocalDev ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api') : '/api';
 if (API_BASE_URL.endsWith('/')) API_BASE_URL = API_BASE_URL.slice(0, -1);
 if (!API_BASE_URL.endsWith('/api') && !isLocalDev) API_BASE_URL += '/api';
-
-import axios from 'axios';
 
 export const sendSmsOtp = async (mobile) => {
   if (!mobile || mobile.length !== 10) {
