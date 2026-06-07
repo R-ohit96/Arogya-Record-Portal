@@ -287,7 +287,11 @@ export const loginUser = async (req, res) => {
     if (role === 'PATIENT' && user.role !== 'PATIENT') {
       return res.status(403).json({ success: false, message: 'Patients must login with Aadhaar.' });
     }
-    if (role !== 'PATIENT' && user.role !== role) {
+    
+    // Allow STAFF to login via HOSPITAL portal
+    if (role === 'HOSPITAL' && (user.role === 'HOSPITAL' || user.role === 'STAFF')) {
+      // Allowed
+    } else if (role !== 'PATIENT' && role !== 'HOSPITAL' && user.role !== role) {
       return res.status(403).json({ success: false, message: `This account is registered as ${user.role}, not ${role}.` });
     }
 
