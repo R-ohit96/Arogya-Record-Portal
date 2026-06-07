@@ -56,3 +56,33 @@ export const createRecord = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to save record' });
   }
 };
+
+export const deleteRecord = async (req, res) => {
+  try {
+    const recordId = req.params.id;
+    const record = await MedicalRecord.findById(recordId);
+    if (!record) {
+      return res.status(404).json({ success: false, message: 'Record not found' });
+    }
+
+    // Attempt to delete from Cloudinary if it's a Cloudinary URL
+    if (record.fileData && record.fileData.includes('res.cloudinary.com')) {
+      try {
+        // Extract public_id from Cloudinary URL
+        const urlParts = record.fileData.split('/');
+        const filePart = urlParts[urlParts.length - 1];
+        const publicId = filePart.split('.')[0];
+        // Note: this assumes the folder structure. Might need to adjust if nested.
+        await cloudinary.uploader.destroy(`aarogya_records/${publicId}`);
+      } catch (e) {
+        console.error('Cloudinary delete error:', e);
+      }
+    }
+
+    await MedicalRecord.findByIdAndDelete(recordId);
+    res.json({ success: true, message: 'Record deleted successfully' });
+  } catch (error) {
+    console.error('Record delete error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete record' });
+  }
+};

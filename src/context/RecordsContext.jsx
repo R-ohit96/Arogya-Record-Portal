@@ -63,10 +63,18 @@ export const RecordsProvider = ({ children }) => {
   };
 
   const deleteRecord = async (recordId) => {
-    // Currently relying on local delete until delete API is created
-    const updatedRecords = records.filter(r => r.id !== recordId);
-    setRecords(updatedRecords);
-    return { success: true };
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/records/${recordId}`);
+      if (response.data.success) {
+        const updatedRecords = records.filter(r => r.id !== recordId);
+        setRecords(updatedRecords);
+        return { success: true };
+      }
+      return { success: false, message: response.data.message || 'Failed to delete' };
+    } catch (e) {
+      console.error("Delete Error:", e);
+      return { success: false, message: 'Server error during delete' };
+    }
   };
 
   const updateRecord = async (recordId, updates) => {
