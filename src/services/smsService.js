@@ -10,7 +10,12 @@ const _generateOtp = () =>
 // ── SMS OTP "" THIS IS FOR LOCALHOST"" ──────────────────────────────────────────────────
 
 const isLocalDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-const API_BASE_URL = isLocalDev ? 'http://localhost:4000' : (typeof window !== 'undefined' ? window.location.origin : '');
+let API_BASE_URL = isLocalDev ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api') : '/api';
+if (API_BASE_URL.endsWith('/')) API_BASE_URL = API_BASE_URL.slice(0, -1);
+if (!API_BASE_URL.endsWith('/api') && !isLocalDev) API_BASE_URL += '/api';
+
+import axios from 'axios';
+
 export const sendSmsOtp = async (mobile) => {
   if (!mobile || mobile.length !== 10) {
     return { success: false, message: 'Valid 10-digit mobile required.' };
@@ -55,16 +60,8 @@ export const sendEmailOtp = async (email) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/send-email-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
+    const response = await axios.post(`${API_BASE_URL}/send-email-otp`, { email });
+    const data = response.data;
 
     return {
       success: data.success,
@@ -72,7 +69,10 @@ export const sendEmailOtp = async (email) => {
     };
   } catch (error) {
     console.error('Error sending email OTP:', error);
-    return { success: false, message: 'Failed to contact server.' };
+    if (error.response && error.response.data) {
+      return { success: false, message: error.response.data.message || 'Failed to send OTP.' };
+    }
+    return { success: false, message: 'Failed to contact server. Please check your connection.' };
   }
 };
 
@@ -80,16 +80,8 @@ export const verifyEmailOtp = async (email, otp) => {
   if (!email || !otp) return { success: false, message: 'Missing data.' };
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/verify-email-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, otp })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
+    const response = await axios.post(`${API_BASE_URL}/verify-email-otp`, { email, otp });
+    const data = response.data;
 
     return {
       success: data.success,
@@ -97,6 +89,9 @@ export const verifyEmailOtp = async (email, otp) => {
     };
   } catch (error) {
     console.error('Error verifying email OTP:', error);
+    if (error.response && error.response.data) {
+      return { success: false, message: error.response.data.message || 'Verification failed.' };
+    }
     return { success: false, message: 'Failed to contact server.' };
   }
 };
