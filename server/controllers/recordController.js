@@ -60,9 +60,16 @@ export const createRecord = async (req, res) => {
 export const deleteRecord = async (req, res) => {
   try {
     const recordId = req.params.id;
+    const { requesterId, requesterRole } = req.body;
+
     const record = await MedicalRecord.findById(recordId);
     if (!record) {
       return res.status(404).json({ success: false, message: 'Record not found' });
+    }
+
+    // Verify Ownership
+    if (record.uploaderId !== requesterId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized: You can only delete your own records.' });
     }
 
     // Attempt to delete from Cloudinary if it's a Cloudinary URL

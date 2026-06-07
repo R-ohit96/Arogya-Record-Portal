@@ -61,6 +61,10 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        alert("File size exceeds 10MB limit. Please choose a smaller file.");
+        return;
+      }
       setFile(selectedFile);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -93,6 +97,7 @@ const UploadModal = ({ isOpen, onClose, patientAadhaar }) => {
       patientAadhaar: patientAadhaar || currentUser.aadhaarNumber,
       uploaderType: currentUser.role === 'STAFF' ? 'HOSPITAL' : currentUser.role,
       uploaderName: currentUser.role === 'STAFF' ? `${currentUser.name} (${currentUser.parentName})` : currentUser.name,
+      uploaderId: currentUser.role === 'STAFF' ? currentUser.parentId : (currentUser.id || currentUser.aadhaarNumber),
       title,
       description,
       imageUrl: previewUrl,

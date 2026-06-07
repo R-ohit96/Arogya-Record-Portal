@@ -62,12 +62,15 @@ export const RecordsProvider = ({ children }) => {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   };
 
-  const deleteRecord = async (recordId) => {
+  const deleteRecord = async (recordId, requesterId, requesterRole) => {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/records/${recordId}`);
+      // Pass the requester's ID and Role so the backend can verify ownership
+      const response = await axios.delete(`${API_BASE_URL}/records/${recordId}`, {
+        data: { requesterId, requesterRole }
+      });
+      
       if (response.data.success) {
-        const updatedRecords = records.filter(r => r.id !== recordId);
-        setRecords(updatedRecords);
+        setRecords(prev => prev.filter(r => r.id !== recordId));
         return { success: true };
       }
       return { success: false, message: response.data.message || 'Failed to delete' };

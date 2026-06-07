@@ -30,7 +30,9 @@ const ReportCard = ({ record }) => {
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this report?')) {
-      deleteRecord(record.id);
+      // Pass currentUser.id and currentUser.role to verify ownership
+      const requesterId = currentUser.role === 'STAFF' ? currentUser.parentId : (currentUser.id || currentUser.aadhaarNumber);
+      deleteRecord(record.id, requesterId, currentUser.role);
     }
   };
 
