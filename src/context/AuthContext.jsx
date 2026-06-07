@@ -206,7 +206,25 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updatePatientProfile = async (aadhaar, updatedData) => {
-    return updateProfile(updatedData);
+    try {
+      const response = await axios.put(`${API_BASE_URL}/auth/profile`, {
+        id: aadhaar,
+        ...updatedData
+      });
+      if (response.data.success) {
+        // If the current user is the patient themselves, update local session
+        if (currentUser && currentUser.aadhaarNumber === aadhaar) {
+          const updatedUser = { ...currentUser, ...response.data.user };
+          setCurrentUser(updatedUser);
+          syncSessionToLocal(updatedUser);
+        }
+        return { success: true };
+      }
+      return { success: false, message: response.data.message || 'Update failed' };
+    } catch (error) {
+      console.error('updatePatientProfile error:', error);
+      return { success: false, message: error.response?.data?.message || 'Error updating profile' };
+    }
   };
 
   const createStaff = async (staffData) => {

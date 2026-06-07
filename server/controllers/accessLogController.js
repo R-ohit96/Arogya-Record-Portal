@@ -85,30 +85,25 @@ export const checkAccessValidity = async (req, res) => {
   try {
     const { patientAadhaar, doctorId } = req.query;
     
-    // Check if there's a revoked log
-    const revokedLog = await AccessLog.findOne({
+    // Find the single most recent access log for this pair
+    const latestLog = await AccessLog.findOne({
       patientAadhaar,
-      doctorId,
-      status: 'REVOKED'
-    }).sort({ updatedAt: -1 });
+      doctorId
+    }).sort({ createdAt: -1 });
 
-    if (revokedLog) {
+    if (!latestLog) {
+      return res.json({ success: true, valid: false, reason: 'EXPIRED' });
+    }
+
+    if (latestLog.status === 'REVOKED') {
       return res.json({ success: true, valid: false, reason: 'REVOKED' });
     }
 
-    // Check if there's an active, non-expired log
-    const activeLog = await AccessLog.findOne({
-      patientAadhaar,
-      doctorId,
-      status: 'OPEN',
-      expiresAt: { $gt: new Date() }
-    });
-
-    if (activeLog) {
+    if (latestLog.status === 'OPEN' && latestLog.expiresAt > new Date()) {
       return res.json({ success: true, valid: true });
     }
 
-    // No active log found = expired
+    // If it's CLOSED or expired
     return res.json({ success: true, valid: false, reason: 'EXPIRED' });
   } catch (error) {
     console.error('Check Access Error:', error);
