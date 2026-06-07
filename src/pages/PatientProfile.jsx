@@ -41,15 +41,15 @@ const PatientProfile = () => {
     }
 
     let isAccessValid = true;
-
-    const grantAccessAndNotify = async (patientMobile) => {
-      const displayName = currentUser.role === 'STAFF' && currentUser.parentName 
+    const displayName = currentUser.role === 'STAFF' && currentUser.parentName 
         ? `${currentUser.name} (${currentUser.parentName})` 
         : currentUser.name;
+    let activeLogId = null;
 
+    const grantAccessAndNotify = async (patientMobile) => {
       try {
         // Create access log on backend (backend auto-checks for existing active logs)
-        await fetch(`${API_BASE_URL}/api/access-logs`, {
+        const response = await fetch(`${API_BASE_URL}/api/access-logs`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -58,6 +58,10 @@ const PatientProfile = () => {
             doctorName: displayName
           })
         });
+        const result = await response.json();
+        if (result.success && result.log) {
+          activeLogId = result.log._id;
+        }
 
         // Send SMS alert to patient
         if (patientMobile) {
@@ -68,7 +72,7 @@ const PatientProfile = () => {
           }).catch(e => console.error('SMS alert failed', e));
         }
       } catch (e) {
-        console.error('Access log creation failed', e);
+        console.error('Access grant error', e);
       }
     };
 
@@ -123,13 +127,14 @@ const PatientProfile = () => {
 
     return () => {
       clearInterval(intervalId);
-      // Auto-close session when doctor leaves the profile page
-      const doctorId = currentUser.id || currentUser._id;
-      fetch(`${API_BASE_URL}/api/access-logs/close`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patientAadhaar: aadhaar, doctorId })
-      }).catch(() => {});
+      // Auto-close specific session when doctor leaves the profile page
+      if (activeLogId) {
+        fetch(`${API_BASE_URL}/api/access-logs/close`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'keepalive': true },
+          body: JSON.stringify({ logId: activeLogId })
+        }).catch(() => {});
+      }
     };
   }, [aadhaar, currentUser, navigate, fetchRecords]);
 

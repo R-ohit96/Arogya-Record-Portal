@@ -68,11 +68,17 @@ export const revokeAccessLog = async (req, res) => {
 // Close access log (doctor leaves the profile page)
 export const closeAccessLog = async (req, res) => {
   try {
-    const { patientAadhaar, doctorId } = req.body;
-    await AccessLog.updateMany(
-      { patientAadhaar, doctorId, status: 'OPEN' },
-      { status: 'CLOSED' }
-    );
+    const { patientAadhaar, doctorId, logId } = req.body;
+    
+    if (logId) {
+      await AccessLog.findByIdAndUpdate(logId, { status: 'CLOSED' });
+    } else {
+      await AccessLog.updateMany(
+        { patientAadhaar, doctorId, status: 'OPEN' },
+        { status: 'CLOSED' }
+      );
+    }
+    
     res.json({ success: true, message: 'Access closed' });
   } catch (error) {
     console.error('Close Access Error:', error);
