@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Search, LogOut, User, QrCode, BadgeCheck, Users, Plus, X, Smartphone } from 'lucide-react';
+import { Search, LogOut, User, QrCode, BadgeCheck, Users, Plus, X, Smartphone, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate, Link } from 'react-router-dom';
 import QRScanner from '../components/QRScanner';
 import ClinicQR from '../components/ClinicQR';
+import axios from 'axios';
 
 const DoctorDashboard = () => {
   const { currentUser, logout, createStaff, fetchStaffList, deleteStaff } = useAuth();
@@ -18,6 +19,7 @@ const DoctorDashboard = () => {
   const [newStaff, setNewStaff] = useState({ name: '', email: '', password: '', mobile: '' });
   const [staffMsg, setStaffMsg] = useState({ type: '', text: '' });
   const [selectedStaffId, setSelectedStaffId] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -75,8 +77,8 @@ const DoctorDashboard = () => {
     if (trimmedAadhaar.length === 12) {
       try {
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000/api' : '/api');
-        const response = await fetch(`${API_BASE_URL}/users/${trimmedAadhaar}`);
-        const result = await response.json();
+        const response = await axios.get(`${API_BASE_URL}/users/${trimmedAadhaar}`);
+        const result = response.data;
         
         if (result.success && result.user && result.user.role === 'PATIENT') {
           navigate(`/patient-profile/${trimmedAadhaar}`);
@@ -87,7 +89,11 @@ const DoctorDashboard = () => {
         }
       } catch (err) {
         console.error("Search error:", err);
-        alert("Error connecting to server. Please try again.");
+        if (err.response && err.response.status === 404) {
+          alert("PATIENT NOT REGISTERED / NOT FOUND");
+        } else {
+          alert(`Error connecting to server: ${err.message}. Please try again.`);
+        }
       }
     } else {
       alert(t('invalid_aadhaar'));
@@ -314,7 +320,19 @@ const DoctorDashboard = () => {
                           <div style={{ marginTop: '0.5rem', fontSize: '0.82rem', borderTop: '1px dashed #cbd5e1', paddingTop: '0.8rem', color: '#334155' }}>
                             <div style={{ marginBottom: '4px' }}><b>Email:</b> {staff.email}</div>
                             <div style={{ marginBottom: '4px' }}><b>Mobile:</b> {staff.mobile}</div>
-                            <div style={{ marginBottom: '4px' }}><b>Password:</b> {staff.plainPassword || '••••••'}</div>
+                            <div style={{ marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <b>Password:</b> 
+                              <span>{showPassword ? (staff.plainPassword || '••••••') : '••••••'}</span>
+                              {staff.plainPassword && (
+                                <button 
+                                  onClick={() => setShowPassword(!showPassword)} 
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: '#64748b' }}
+                                  title="Toggle password visibility"
+                                >
+                                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                                </button>
+                              )}
+                            </div>
                             <div style={{ marginTop: '8px', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b', display: 'inline-block' }}>
                               <b>ID Created:</b> {new Date(staff.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                             </div>
