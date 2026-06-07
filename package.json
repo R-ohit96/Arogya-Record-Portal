@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:frontend": "vite",
+    "start": "node server.js",
     "dev": "concurrently \"npm run dev:frontend\" \"node server.js\"",
     "secure-dev": "concurrently \"npm run dev:frontend\" \"node server.js\" \"node waf.js\"",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "preview": "vite preview"
   },
   "dependencies": {

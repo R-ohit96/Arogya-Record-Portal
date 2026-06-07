@@ -8,7 +8,8 @@ import UploadModal from '../components/UploadModal';
 import { useLanguage } from '../context/LanguageContext';
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:4000' : '');
+const isLocalDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API_BASE_URL = isLocalDev ? 'http://localhost:4000' : '';
 
 const PatientProfile = () => {
   const { aadhaar } = useParams();

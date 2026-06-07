@@ -203,7 +203,7 @@ export const createStaff = async (req, res) => {
 
 export const getStaffList = async (req, res) => {
   try {
-    const staffList = await User.find({ parentId: req.params.parentId, role: 'STAFF' });
+    const staffList = await User.find({ parentId: req.params.parentId, role: 'STAFF' }).select('-password');
     res.json({ success: true, staff: staffList });
   } catch (error) {
     console.error('Staff List Error:', error);

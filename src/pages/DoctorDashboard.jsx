@@ -310,7 +310,7 @@ const DoctorDashboard = () => {
                           <div style={{ marginTop: '0.5rem', fontSize: '0.82rem', borderTop: '1px dashed #cbd5e1', paddingTop: '0.8rem', color: '#334155' }}>
                             <div style={{ marginBottom: '4px' }}><b>Email:</b> {staff.email}</div>
                             <div style={{ marginBottom: '4px' }}><b>Mobile:</b> {staff.mobile}</div>
-                            <div style={{ marginBottom: '4px' }}><b>Password:</b> {staff.password}</div>
+
                             <div style={{ marginTop: '8px', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b', display: 'inline-block' }}>
                               <b>ID Created:</b> {new Date(staff.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                             </div>
