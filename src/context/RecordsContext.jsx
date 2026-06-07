@@ -81,14 +81,23 @@ export const RecordsProvider = ({ children }) => {
   };
 
   const updateRecord = async (recordId, updates) => {
-    const updatedRecords = records.map(r => {
-      if (r.id === recordId) {
-        return { ...r, ...updates };
+    try {
+      const response = await axios.put(`${API_BASE_URL}/records/${recordId}`, updates);
+      if (response.data.success) {
+        const updatedRecords = records.map(r => {
+          if (r.id === recordId) {
+            return { ...r, ...updates };
+          }
+          return r;
+        });
+        setRecords(updatedRecords);
+        return { success: true };
       }
-      return r;
-    });
-    setRecords(updatedRecords);
-    return { success: true };
+      return { success: false, message: response.data.message || 'Failed to update record' };
+    } catch (e) {
+      console.error("Update Record Error:", e);
+      return { success: false, message: 'Server error during update' };
+    }
   };
 
   return (

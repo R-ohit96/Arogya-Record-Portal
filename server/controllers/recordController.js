@@ -93,3 +93,26 @@ export const deleteRecord = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to delete record' });
   }
 };
+export const updateRecord = async (req, res) => {
+  try {
+    const recordId = req.params.id;
+    const updates = req.body;
+    
+    const record = await MedicalRecord.findByIdAndUpdate(
+      recordId, 
+      { $set: updates },
+      { new: true }
+    );
+    
+    if (!record) {
+      return res.status(404).json({ success: false, message: 'Record not found' });
+    }
+    
+    // Return mapped record with id
+    const responseRecord = { ...record.toObject(), id: record._id };
+    res.json({ success: true, message: 'Record updated successfully', record: responseRecord });
+  } catch (error) {
+    console.error('Record update error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update record' });
+  }
+};
